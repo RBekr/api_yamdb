@@ -1,4 +1,5 @@
 from users.models import User
+from reviews.models import Review
 from users.models import ROLE_CHOICES
 from rest_framework import serializers
 
@@ -40,3 +41,14 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 f'Имя пользователя не может быть равно {attrs["username"]}')
         return super().validate(attrs)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username', read_only=True)
+    title = serializers.SlugRelatedField(
+        read_only=True, slug_field='id')
+
+    class Meta:
+        model = Review
+        fields = '__all__'
