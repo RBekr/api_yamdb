@@ -2,8 +2,12 @@ from users.models import User
 from users.models import ROLE_CHOICES
 from rest_framework import serializers
 
-class UserSerializers(serializers.ModelSerializer):
-    role =  serializers.ChoiceField(choices=ROLE_CHOICES)
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True, unique=True)
+    email = serializers.EmailField(required=True, unique=True)
+    role = serializers.ChoiceField(choices=ROLE_CHOICES)
+
     class Meta:
         model = User
         fields = (
@@ -12,8 +16,27 @@ class UserSerializers(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
-    
+
     def validate_username(self, value):
         if value == 'me':
-            raise serializers.ValidationError(f'Имя пользователя не может ровняться {value}')
+            raise serializers.ValidationError(
+                f'Имя пользователя не может быть равно {value}'
+            )
         return value
+
+
+class UserSignUpSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True, unique=True)
+    email = serializers.EmailField(required=True, unique=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'email', 'username',
+        )
+
+    def validate(self, attrs):
+        if attrs['username'] == 'me':
+            raise serializers.ValidationError(
+                f'Имя пользователя не может быть равно {attrs["username"]}')
+        return super().validate(attrs)
