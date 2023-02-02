@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from users.models import User
 
@@ -31,9 +30,8 @@ class Title(models.Model):
         verbose_name='Категория',
     )
 
-    def __str__(self): 
+    def __str__(self):
         return self.name
-
 
 
 class Review(models.Model):
@@ -67,10 +65,28 @@ class Review(models.Model):
         ]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-    
+
     def __str__(self):
         return self.text[:15]
 
 
 class Comment(models.Model):
-    pass
+    review = models.ForeignKey(
+        Review,
+        related_name='comments',
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField(
+        verbose_name='Текст комментария'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.text[:15]
