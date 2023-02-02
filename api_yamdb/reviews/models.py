@@ -1,11 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-
-User = get_user_model()
-
-
-class Title(models.Model):
-    pass
+from users.models import User
 
 
 class Category(models.Model):
@@ -14,6 +9,31 @@ class Category(models.Model):
 
 class Genre(models.Model):
     pass
+
+
+class Title(models.Model):
+    name = models.CharField(max_length=256)
+    year = models.IntegerField()
+    description = models.TextField()
+    genre = models.ManyToManyField(
+        Genre,
+        blank=True,
+        null=True,
+        related_name='titles',
+        verbose_name='Жанр',
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='titles',
+        verbose_name='Категория',
+    )
+
+    def __str__(self): 
+        return self.name
+
 
 
 class Review(models.Model):

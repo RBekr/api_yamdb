@@ -1,17 +1,32 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
+from reviews.models import Title, Review
 from users.models import User
-from reviews.models import Title
-from .serializers import UserSerializer, ReviewSerializer
+from .serializers import TitleSerializer, UserSerializer, ReviewSerializer
+
+class TitleViewSet(ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = AllowAny
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_fields = ('category', 'genre', 'name', 'year')
+    search_fields = ('genre', 'category')
+    
+    def get_review(self):
+        reviews = get_object_or_404(Review, pk=self.kwargs.get('title_id'))
+        return reviews
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser, )
@@ -32,7 +47,8 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(ModelViewSet):
+    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
 
