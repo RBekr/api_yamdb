@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.decorators import list_route
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -16,7 +16,8 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser, )
 
-    @list_route(
+    @action(
+        detail=False,
         methods=['GET', 'PATCH'],
         permission_classes=[IsAuthenticated])
     def me(self):

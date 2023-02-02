@@ -5,8 +5,8 @@ from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True, unique=True)
-    email = serializers.EmailField(required=True, unique=True)
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
     role = serializers.ChoiceField(choices=ROLE_CHOICES)
 
     class Meta:
@@ -27,8 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserSignUpSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True, unique=True)
-    email = serializers.EmailField(required=True, unique=True)
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
