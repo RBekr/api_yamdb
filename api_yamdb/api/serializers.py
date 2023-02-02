@@ -1,19 +1,34 @@
-
-from users.models import User
-from reviews.models import Review, Title
-from users.models import ROLE_CHOICES
 from rest_framework import serializers
-
+from reviews.models import Review, Title, Category, Genre
+from users.models import ROLE_CHOICES, User
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(many=True,
-        read_only=True, slug_field='slug')
+    genre = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field='slug')
     category = serializers.SlugRelatedField(read_only=True, slug_field='slug')
 
     class Meta:
         model = Title
         fields = '__all__'
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = '__all__'
+        read_only_fields = (id,)
+        lookup_field = 'slug'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = '__all__'
+        read_only_fields = (id,)
+        lookup_field = 'slug'
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -69,4 +84,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-

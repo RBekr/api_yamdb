@@ -1,14 +1,21 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from users.models import User
 
 
 class Category(models.Model):
-    pass
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Genre(models.Model):
-    pass
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Title(models.Model):
@@ -18,7 +25,6 @@ class Title(models.Model):
     genre = models.ManyToManyField(
         Genre,
         blank=True,
-        null=True,
         related_name='titles',
         verbose_name='Жанр',
     )
@@ -31,9 +37,8 @@ class Title(models.Model):
         verbose_name='Категория',
     )
 
-    def __str__(self): 
+    def __str__(self):
         return self.name
-
 
 
 class Review(models.Model):
@@ -67,10 +72,6 @@ class Review(models.Model):
         ]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-    
+
     def __str__(self):
         return self.text[:15]
-
-
-class Comment(models.Model):
-    pass

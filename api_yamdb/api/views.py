@@ -1,29 +1,49 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
-from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
+from rest_framework import filters, status
 from rest_framework.decorators import action
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
-
-from reviews.models import Title, Review
+from rest_framework.viewsets import ModelViewSet
+from reviews.models import Category, Genre, Review, Title
 from users.models import User
-from .serializers import TitleSerializer, UserSerializer, ReviewSerializer
+
+from .serializers import (CategorySerializer, GenreSerializer,
+                          ReviewSerializer, TitleSerializer, UserSerializer)
+
 
 class TitleViewSet(ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = AllowAny
+    permission_classes = [IsAdminUser,]
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('category', 'genre', 'name', 'year')
-    search_fields = ('genre', 'category')
-    
+    search_fields = ('genre', 'category',)
+
     def get_review(self):
         reviews = get_object_or_404(Review, pk=self.kwargs.get('title_id'))
         return reviews
+
+
+class GenreViewSet(ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = PageNumberPagination
+    permission_classes = [IsAdminUser,]
+    search_field = ('name',)
+    lookup_field = 'slug'
+
+
+class CategoryViewSet(ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
+    permission_classes = [IsAdminUser,]
+    search_field = ('name',)
+    lookup_field = 'slug'
 
 
 class UserViewSet(ModelViewSet):
