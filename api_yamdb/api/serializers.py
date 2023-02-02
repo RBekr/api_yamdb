@@ -45,9 +45,14 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        slug_field='username', read_only=True)
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
     title = serializers.SlugRelatedField(
-        read_only=True, slug_field='id')
+        read_only=True,
+        slug_field='id'
+    )
 
     class Meta:
         model = Review
