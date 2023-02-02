@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
@@ -17,7 +16,7 @@ class TitleViewSet(ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = AllowAny
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (filters.SearchFilter, )
     filterset_fields = ('category', 'genre', 'name', 'year')
     search_fields = ('genre', 'category')
     

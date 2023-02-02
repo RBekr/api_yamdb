@@ -1,9 +1,6 @@
-
-from users.models import User
-from reviews.models import Review, Title
-from users.models import ROLE_CHOICES
 from rest_framework import serializers
-
+from reviews.models import Review, Title
+from users.models import ROLE_CHOICES, User
 
 
 class TitleSerializer(serializers.ModelSerializer):
