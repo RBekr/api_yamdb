@@ -1,11 +1,10 @@
 import django.utils.timezone as timezone
-
 from rest_framework import serializers
 from reviews.models import Category, Genre, Review, Title
 from users.models import ROLE_CHOICES, User
 
 
-class GenreSerializer(serializers.ModelSerializer): 
+class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
@@ -21,7 +20,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['name', 'slug']
         read_only_fields = (id,)
         lookup_field = 'slug'
-
 
 
 class TitleSerializerMany(serializers.ModelSerializer):

@@ -20,17 +20,15 @@ class TitleViewSet(ModelViewSet):
     serializer_class_one = TitleSerializerOne
     serializer_class_many = TitleSerializerMany
 
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
 
-    
     def get_serializer_class(self):
-        if self.action in ['list','retrieve']:
+        if self.action in ['list', 'retrieve']:
             return TitleSerializerMany
-        return TitleSerializerOne 
-
+        return TitleSerializerOne
 
     def get_review(self):
         reviews = get_object_or_404(Review, pk=self.kwargs.get('title_id'))
@@ -41,7 +39,7 @@ class GenreViewSet(ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
     search_field = ('name',)
     lookup_field = 'slug'
 
@@ -50,7 +48,7 @@ class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
     search_field = ('name',)
     lookup_field = 'slug'
 
