@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 
 ROLE_CHOICES = [
@@ -9,6 +10,15 @@ ROLE_CHOICES = [
 
 
 class User(AbstractUser):
+    email = models.EmailField(
+        unique=True,
+        max_length=254
+    )
+    username = models.CharField(
+        unique=True,
+        max_length=150,
+        validators=[UnicodeUsernameValidator()]
+    )
     role = models.CharField(
         max_length=10,
         choices=ROLE_CHOICES,
@@ -16,7 +26,6 @@ class User(AbstractUser):
     )
     bio = models.TextField(
         blank=True,
-        null=True
     )
 
     class Meta:
@@ -27,6 +36,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def save(self, *args, **kwargs) -> None:
+        if self.is_superuser:
+            self.role = 'admin'
+        super().save(*args, **kwargs)
 
     @property
     def is_admin(self):

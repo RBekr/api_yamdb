@@ -1,55 +1,63 @@
 from rest_framework import serializers
 from reviews.models import Review, Title
-from users.models import ROLE_CHOICES, User
-
-
-class TitleSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(many=True,
-        read_only=True, slug_field='slug')
-    category = serializers.SlugRelatedField(read_only=True, slug_field='slug')
-
-    class Meta:
-        model = Title
-        fields = '__all__'
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    role = serializers.ChoiceField(choices=ROLE_CHOICES)
-
     class Meta:
         model = User
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         )
 
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
-
-    def validate_username(self, value):
-        if value == 'me':
+    def validate(self, value):
+        if value == 'me' or value == '':
             raise serializers.ValidationError(
                 f'Имя пользователя не может быть равно {value}'
             )
         return value
 
 
-class UserSignUpSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
+class UserSignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
 
     class Meta:
-        model = User
         fields = (
-            'email', 'username',
+            'username', 'email'
         )
 
-    def validate(self, attrs):
-        if attrs['username'] == 'me':
+    def validate_username(self, value):
+        if value == 'me' or value == '':
             raise serializers.ValidationError(
-                f'Имя пользователя не может быть равно {attrs["username"]}')
+                f'Имя пользователя не может быть равно {value}'
+            )
+
+    def validate(self, attrs):
+        user_by_username = User.objects.filter(username=attrs['username'])
+        user_by_email = User.objects.filter(email=attrs['email'])
+        if (user_by_username.exists
+           and user_by_username.first != user_by_email.first):
+            raise serializers.ValidationError(
+                'Пользователь с таким именем или email уже существует'
+            )
         return super().validate(attrs)
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        many=True,
+        read_only=True, slug_field='slug')
+    category = serializers.SlugRelatedField(read_only=True, slug_field='slug')
+
+    class Meta:
+        model = Title
+        fields = '__all__'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -66,4 +74,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-
