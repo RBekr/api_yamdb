@@ -29,7 +29,6 @@ class User(AbstractUser):
     )
 
     class Meta:
-        db_table = 'user'
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ('id',)
@@ -40,7 +39,7 @@ class User(AbstractUser):
     def save(self, *args, **kwargs) -> None:
         if self.is_superuser:
             self.role = 'admin'
-        super().save(*args, **kwargs)
+        return super(User, self).save(*args, **kwargs)
 
     @property
     def is_admin(self):

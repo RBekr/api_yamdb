@@ -1,9 +1,9 @@
 from django.urls import include, path
-from rest_framework import routers
 
+from .routers import NoPutRouter
 from .views import TitleViewSet, TokenAPI, UserSignUpAPI, UserViewSet
 
-router_v1 = routers.DefaultRouter()
+router_v1 = NoPutRouter()
 router_v1.register('v1/users', UserViewSet, basename='users')
 router_v1.register('v1/titles', TitleViewSet, basename='titles')
 

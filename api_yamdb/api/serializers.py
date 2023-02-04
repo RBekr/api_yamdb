@@ -1,3 +1,4 @@
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework import serializers
 from reviews.models import Review, Title
 from users.models import User
@@ -19,8 +20,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserSignUpSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True, max_length=254)
+    username = serializers.CharField(
+        required=True,
+        max_length=150,
+        validators=[UnicodeUsernameValidator()])
 
     class Meta:
         fields = (
@@ -32,12 +36,13 @@ class UserSignUpSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 f'Имя пользователя не может быть равно {value}'
             )
+        return value
 
     def validate(self, attrs):
         user_by_username = User.objects.filter(username=attrs['username'])
         user_by_email = User.objects.filter(email=attrs['email'])
         if (user_by_username.exists
-           and user_by_username.first != user_by_email.first):
+           and user_by_username.first() != user_by_email.first()):
             raise serializers.ValidationError(
                 'Пользователь с таким именем или email уже существует'
             )

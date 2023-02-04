@@ -18,24 +18,13 @@ from .serializers import (ReviewSerializer, TitleSerializer, TokenSerializer,
                           UserSerializer, UserSignUpSerializer)
 
 
-class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = AllowAny
-    pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter, )
-    filterset_fields = ('category', 'genre', 'name', 'year')
-    search_fields = ('genre', 'category')
-
-    def get_review(self):
-        return get_object_or_404(Review, pk=self.kwargs.get('title_id'))
-
-
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdmin, )
+    filter_backends = (filters.SearchFilter, )
     lookup_field = 'username'
+    search_fields = ('username',)
 
     @action(
         detail=False,
@@ -61,6 +50,7 @@ class UserSignUpAPI(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request):
+
         serializer = UserSignUpSerializer(
             data=request.data
         )
@@ -101,6 +91,19 @@ class TokenAPI(APIView):
             {'confirmation_code': 'Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class TitleViewSet(ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = AllowAny
+    pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter, )
+    filterset_fields = ('category', 'genre', 'name', 'year')
+    search_fields = ('genre', 'category')
+
+    def get_review(self):
+        return get_object_or_404(Review, pk=self.kwargs.get('title_id'))
 
 
 class ReviewViewSet(ModelViewSet):
