@@ -24,12 +24,6 @@ class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
     description = models.TextField()
-    genre = models.ManyToManyField(
-        Genre,
-        blank=True,
-        related_name='titles',
-        verbose_name='Жанр',
-    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -37,10 +31,15 @@ class Title(models.Model):
         null=True,
         verbose_name='Категория',
     )
+    genre = models.ManyToManyField(
+        Genre,
+        blank=True,
+        related_name='titles',
+        verbose_name='Жанр',
+    )
 
     def __str__(self):
         return self.name
-
 
 class Review(models.Model):
     title = models.ForeignKey(

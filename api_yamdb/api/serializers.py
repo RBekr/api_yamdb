@@ -1,6 +1,7 @@
 import django.utils.timezone as timezone
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from users.models import ROLE_CHOICES, User
 from reviews.models import Comment, Review, Category, Genre, Review, Title
@@ -122,17 +123,6 @@ class UserSignUpSerializer(serializers.Serializer):
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
-
-
-class TitleSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(
-        many=True,
-        read_only=True, slug_field='slug')
-    category = serializers.SlugRelatedField(read_only=True, slug_field='slug')
-
-    class Meta:
-        model = Title
-        fields = '__all__'
 
 
 class ReviewSerializer(serializers.ModelSerializer):

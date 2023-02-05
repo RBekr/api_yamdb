@@ -30,10 +30,15 @@ class TitleViewSet(ModelViewSet):
     serializer_class_one = TitleSerializerOne
     serializer_class_many = TitleSerializerMany
 
-    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
+    permission_classes = (IsAdmin, )
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = (AllowAny, )
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
@@ -49,7 +54,7 @@ class GenreViewSet(ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
+    permission_classes = (IsAdmin, )
     search_field = ('name',)
     lookup_field = 'slug'
 
@@ -58,7 +63,7 @@ class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
+    permission_classes = (IsAdmin, )
     search_field = ('name',)
     lookup_field = 'slug'
 
@@ -136,19 +141,6 @@ class TokenAPI(APIView):
             {'confirmation_code': 'Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST
         )
-
-
-class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = AllowAny
-    pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter, )
-    filterset_fields = ('category', 'genre', 'name', 'year')
-    search_fields = ('genre', 'category')
-
-    def get_review(self):
-        return get_object_or_404(Review, pk=self.kwargs.get('title_id'))
 
 
 class ReviewViewSet(ModelViewSet):
