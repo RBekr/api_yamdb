@@ -8,6 +8,9 @@ class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
+    class Meta:
+        ordering = ('-id', )
+
     def __str__(self):
         return self.name
 
@@ -15,6 +18,9 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ('-id', )
 
     def __str__(self):
         return self.name
@@ -26,6 +32,7 @@ class Title(models.Model):
     description = models.TextField()
     category = models.ForeignKey(
         Category,
+        related_name='titles',
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
@@ -37,6 +44,9 @@ class Title(models.Model):
         related_name='titles',
         verbose_name='Жанр',
     )
+
+    class Meta:
+        ordering = ('-id', )
 
     def __str__(self):
         return self.name
