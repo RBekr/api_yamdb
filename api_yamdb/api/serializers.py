@@ -1,17 +1,26 @@
-from users.models import User
-from reviews.models import Comment, Review, Title
-from users.models import ROLE_CHOICES
+from django.db.models import Avg
 from rest_framework import serializers
+from reviews.models import Comment, Review, Title
+from users.models import ROLE_CHOICES, User
 
 
 class TitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(many=True,
         read_only=True, slug_field='slug')
     category = serializers.SlugRelatedField(read_only=True, slug_field='slug')
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
         fields = '__all__'
+
+    def get_rating(self, obj):
+        rating = Review.objects.filter(
+            title=obj.id
+        ).aggregate(Avg('score'))['score__avg']
+        if rating is not None:
+            return round(rating)
+        return None
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -67,6 +76,16 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+    def validate(self, data):
+        if self.context['request'].method == 'PATCH':
+            return data
+        title = self.context['view'].kwargs['title_id']
+        author = self.context['request'].user
+        if Review.objects.filter(author=author, title__id=title).exists():
+            raise serializers.ValidationError('Вы уже поставили'
+                                              'оценку данному произведению')
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
