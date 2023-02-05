@@ -8,30 +8,59 @@ from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Comment, Review, Title
+from reviews.models import Category, Genre, Comment, Review, Title
 from users.models import User
 
 from .permissions import IsAdmin
-from .serializers import (CommentSerializer, ReviewSerializer, TitleSerializer,
+from .serializers import (CategorySerializer, GenreSerializer, CommentSerializer, ReviewSerializer,
+                          TitleSerializerMany,
+                          TitleSerializerOne,
                           TokenSerializer, UserSerializer, UserSignUpSerializer)
 
 
 class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = AllowAny
-    pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    queryset = Title.objects.select_related('category').\
+        prefetch_related('genre')
+    serializer_class_one = TitleSerializerOne
+    serializer_class_many = TitleSerializerMany
+
+    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
-    search_fields = ('genre', 'category')
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return TitleSerializerMany
+        return TitleSerializerOne
 
     def get_review(self):
         reviews = get_object_or_404(Review, pk=self.kwargs.get('title_id'))
         return reviews
+
+
+class GenreViewSet(ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = PageNumberPagination
+    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
+    search_field = ('name',)
+    lookup_field = 'slug'
+
+
+class CategoryViewSet(ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
+    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
+    search_field = ('name',)
+    lookup_field = 'slug'
 
 
 class UserViewSet(ModelViewSet):

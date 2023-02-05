@@ -1,13 +1,32 @@
+import django.utils.timezone as timezone
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import Avg
 from rest_framework import serializers
-from reviews.models import Comment, Review, Title
 from users.models import ROLE_CHOICES, User
+from reviews.models import Comment, Review, Category, Genre, Review, Title
 
-class TitleSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(many=True,
-        read_only=True, slug_field='slug')
-    category = serializers.SlugRelatedField(read_only=True, slug_field='slug')
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ['name', 'slug']
+        read_only_fields = (id,)
+        lookup_field = 'slug'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ['name', 'slug']
+        read_only_fields = (id,)
+        lookup_field = 'slug'
+
+
+class TitleSerializerMany(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
     rating = serializers.SerializerMethodField()
 
     class Meta:
@@ -21,6 +40,38 @@ class TitleSerializer(serializers.ModelSerializer):
         if rating is not None:
             return round(rating)
         return None
+
+
+class TitleSerializerOne(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(), many=True, slug_field='slug'
+    )
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(), slug_field='slug'
+    )
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        rating = Review.objects.filter(
+            title=obj.id
+        ).aggregate(Avg('score'))['score__avg']
+        if rating is not None:
+            return round(rating)
+        return None
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+    def validate(self, data):
+        if data.get('year') and data.get('year') > timezone.now().year:
+            raise serializers.ValidationError(
+                'Год выпуска произведения, больше текущего!'
+            )
+        return data
+
+    def to_representation(self, instance):
+        return TitleSerializerMany(instance).data
 
 
 class UserSerializer(serializers.ModelSerializer):
