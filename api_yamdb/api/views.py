@@ -7,7 +7,7 @@ from rest_framework.pagination import (LimitOffsetPagination,
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from reviews.models import Review, Title
+from reviews.models import Comment, Review, Title
 from users.models import User
 
 from .serializers import (CommentSerializer, ReviewSerializer, TitleSerializer,
@@ -66,7 +66,7 @@ class ReviewViewSet(ModelViewSet):
 
 
 class CommentViewSet(ModelViewSet):
-    queryset = Review.objects.all()
+    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
 
