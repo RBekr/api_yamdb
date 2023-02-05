@@ -1,3 +1,5 @@
+
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
 
@@ -52,8 +54,8 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True
     )
-    score = models.TextField(
-        verbose_name='в работе'
+    score = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
     )
 
     class Meta:
@@ -71,4 +73,22 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-    pass
+    review = models.ForeignKey(
+        Review,
+        related_name='comments',
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField(
+        verbose_name='Текст комментария'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.text[:15]
