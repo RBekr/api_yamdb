@@ -9,3 +9,15 @@ class IsAdmin(permissions.BasePermission):
 class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         return not request.user.is_anonymous and request.user.is_moderator
+
+
+class IsAuthorAdminModeratorOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.role == 'admin'
+                or request.user.role == 'moderator'
+                or obj.author == request.user)
+
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated)
