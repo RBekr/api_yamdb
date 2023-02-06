@@ -1,7 +1,10 @@
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, viewsets
 
-class GenresCategoriesMixin(mixins.ListModelMixin,
-                    mixins.DestroyModelMixin,
-                    mixins.CreateModelMixin,
-                    viewsets.GenericViewSet):
+
+class GenresCategoriesMixin(
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
     pass

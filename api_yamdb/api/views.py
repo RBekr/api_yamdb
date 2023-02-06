@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status
 from rest_framework.decorators import action
-from rest_framework.pagination import (PageNumberPagination)
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,8 +13,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
-from .mixins import GenresCategoriesMixin
 from .filters import TitleFilter
+from .mixins import GenresCategoriesMixin
 from .permissions import IsAdmin
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
@@ -25,8 +25,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
 
 class TitleViewSet(ModelViewSet):
     queryset = Title.objects.select_related(
-        'category'
-        ).prefetch_related('genre')
+        'category').prefetch_related('genre')
     serializer_class_one = TitleSerializerOne
     serializer_class_many = TitleSerializerMany
 
@@ -46,8 +45,7 @@ class TitleViewSet(ModelViewSet):
         return TitleSerializerOne
 
     def get_review(self):
-        reviews = get_object_or_404(Review, pk=self.kwargs.get('title_id'))
-        return reviews
+        return get_object_or_404(Review, pk=self.kwargs.get('title_id'))
 
 
 class GenreViewSet(GenresCategoriesMixin):
@@ -78,6 +76,7 @@ class CategoryViewSet(GenresCategoriesMixin):
         if self.request.method == 'GET':
             self.permission_classes = (AllowAny, )
         return super().get_permissions()
+
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()

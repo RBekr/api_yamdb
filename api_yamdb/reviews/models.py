@@ -1,6 +1,5 @@
-from django.db import models
-
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from users.models import User
 
 
@@ -50,6 +49,7 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Review(models.Model):
     title = models.ForeignKey(
