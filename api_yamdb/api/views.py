@@ -137,20 +137,7 @@ class TokenAPI(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-
-class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = AllowAny
-    pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter, )
-    filterset_fields = ('category', 'genre', 'name', 'year')
-    search_fields = ('genre', 'category')
-
-    def get_review(self):
-        return get_object_or_404(Review, pk=self.kwargs.get('title_id'))
-
-
+ 
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
