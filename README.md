@@ -59,6 +59,6 @@ __ДОКУМЕНТАЦИЯ__
 
 `POST /api/v1/titles/{title_id}/reviews`
 
-[__Авторы: Руслан__](https://github.com/RBekr) 
+__Авторы__: [__Руслан__](https://github.com/RBekr) 
 [__Никита__](https://github.com/Irena-bun)
 [__Ирена__](https://github.com/Mr-Green-N)
