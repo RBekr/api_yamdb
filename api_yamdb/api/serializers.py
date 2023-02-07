@@ -156,6 +156,9 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
+    review = serializers.PrimaryKeyRelatedField(
+        read_only=True
+    )
 
     class Meta:
         model = Comment
