@@ -13,6 +13,9 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
+
+from .filters import TitleFilter
+from .mixins import GenresCategoriesMixin
 from .permissions import IsAdmin, IsAuthorAdminModeratorOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
@@ -22,15 +25,20 @@ from .serializers import (CategorySerializer, CommentSerializer,
 
 
 class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.select_related('category').\
-        prefetch_related('genre')
+    queryset = Title.objects.select_related(
+        'category').prefetch_related('genre')
     serializer_class_one = TitleSerializerOne
     serializer_class_many = TitleSerializerMany
 
-    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
+    permission_classes = (IsAdmin, )
     pagination_class = PageNumberPagination
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category', 'genre', 'name', 'year')
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = TitleFilter
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = (AllowAny, )
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
@@ -38,26 +46,37 @@ class TitleViewSet(ModelViewSet):
         return TitleSerializerOne
 
     def get_review(self):
-        reviews = get_object_or_404(Review, pk=self.kwargs.get('title_id'))
-        return reviews
+        return get_object_or_404(Review, pk=self.kwargs.get('title_id'))
 
 
-class GenreViewSet(ModelViewSet):
+class GenreViewSet(GenresCategoriesMixin):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
-    search_field = ('name',)
+    permission_classes = (IsAdmin, )
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name',)
     lookup_field = 'slug'
 
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = (AllowAny, )
+        return super().get_permissions()
 
-class CategoryViewSet(ModelViewSet):
+
+class CategoryViewSet(GenresCategoriesMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    permission_classes = [AllowAny, ]  # изменить в след. фиче IsAdminUser
-    search_field = ('name',)
+    permission_classes = (IsAdmin, )
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name',)
     lookup_field = 'slug'
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = (AllowAny, )
+        return super().get_permissions()
 
 
 class UserViewSet(ModelViewSet):
