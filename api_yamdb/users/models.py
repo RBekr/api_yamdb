@@ -13,7 +13,6 @@ class User(AbstractUser):
     email = models.EmailField(
         unique=True,
         max_length=254,
-        null=True
     )
     username = models.CharField(
         unique=True,
@@ -21,9 +20,6 @@ class User(AbstractUser):
         validators=[UnicodeUsernameValidator()]
     )
     password = models.CharField(max_length=20, null=True)
-    is_superuser = models.BooleanField(null=True)
-    is_active = models.BooleanField(null=True)
-    is_staff = models.BooleanField(null=True)
     role = models.CharField(
         max_length=10,
         choices=ROLE_CHOICES,
