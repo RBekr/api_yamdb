@@ -12,21 +12,30 @@ ROLE_CHOICES = [
 class User(AbstractUser):
     email = models.EmailField(
         unique=True,
-        max_length=254
+        max_length=254,
+        null=True
     )
     username = models.CharField(
         unique=True,
         max_length=150,
         validators=[UnicodeUsernameValidator()]
     )
+    password = models.CharField(max_length=20, null=True)
+    is_superuser = models.BooleanField(null=True)
+    is_active = models.BooleanField(null=True)
+    is_staff = models.BooleanField(null=True)
     role = models.CharField(
         max_length=10,
         choices=ROLE_CHOICES,
         default='user'
     )
+    date_joined = models.DateTimeField(null=True)
     bio = models.TextField(
         blank=True,
+        null=True
     )
+    first_name = models.CharField(max_length=50, null=True)
+    last_name = models.CharField(max_length=50, null=True)
 
     class Meta:
         verbose_name = 'Пользователь'
