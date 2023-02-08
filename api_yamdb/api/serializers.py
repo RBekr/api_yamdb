@@ -2,8 +2,8 @@ import django.utils.timezone as timezone
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import Avg
 from rest_framework import serializers
-from users.models import ROLE_CHOICES, User
-from reviews.models import Comment, Review, Category, Genre, Review, Title
+from reviews.models import Category, Comment, Genre, Review, Title
+from users.models import User
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -155,6 +155,9 @@ class CommentSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True,
         default=serializers.CurrentUserDefault()
+    )
+    review = serializers.PrimaryKeyRelatedField(
+        read_only=True
     )
 
     class Meta:
