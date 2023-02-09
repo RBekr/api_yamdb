@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.core import validators
 from django.db import models
+
 from users.models import User
 
 
