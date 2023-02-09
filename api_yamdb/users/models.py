@@ -11,27 +11,46 @@ ROLE_CHOICES = [
 
 class User(AbstractUser):
     email = models.EmailField(
+        verbose_name='Email',
         unique=True,
         max_length=254,
     )
     username = models.CharField(
+        verbose_name='Имя пользователя',
         unique=True,
         max_length=150,
         validators=[UnicodeUsernameValidator()]
     )
-    password = models.CharField(max_length=20, null=True)
+    password = models.CharField(
+        verbose_name='Пароль',
+        max_length=20,
+        null=True
+    )
     role = models.CharField(
-        max_length=10,
+        verbose_name='Роль',
+        max_length=20,
         choices=ROLE_CHOICES,
         default='user'
     )
-    date_joined = models.DateTimeField(null=True)
+    date_joined = models.DateTimeField(
+        verbose_name='Дата регистрации',
+        null=True
+    )
     bio = models.TextField(
+        verbose_name='Биограффия',
         blank=True,
         null=True
     )
-    first_name = models.CharField(max_length=50, null=True)
-    last_name = models.CharField(max_length=50, null=True)
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=50,
+        null=True
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        max_length=50,
+        null=True
+    )
 
     class Meta:
         verbose_name = 'Пользователь'

@@ -1,7 +1,7 @@
-from rest_framework.routers import DefaultRouter
+from rest_framework import routers
 
 
-class NoPutRouter(DefaultRouter):
+class NoPutRouter(routers.DefaultRouter):
     """
     Router class that disables the PUT method.
     """

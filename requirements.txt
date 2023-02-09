@@ -3,6 +3,7 @@ Django
 djangorestframework
 django-filter
 djangorestframework-simplejwt
+python-dotenv
 pandas
 PyJWT
 pytest

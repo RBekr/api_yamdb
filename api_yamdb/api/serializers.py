@@ -1,4 +1,5 @@
-import django.utils.timezone as timezone
+import datetime as dt
+
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import Avg
 from rest_framework import serializers
@@ -10,7 +11,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ['name', 'slug']
+        fields = ('name', 'slug', )
         read_only_fields = (id,)
         lookup_field = 'slug'
 
@@ -19,7 +20,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['name', 'slug']
+        fields = ('name', 'slug', )
         read_only_fields = (id,)
         lookup_field = 'slug'
 
@@ -31,7 +32,8 @@ class TitleSerializerMany(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description',
+                  'category', 'genre', 'rating', )
 
     def get_rating(self, obj):
         rating = Review.objects.filter(
@@ -49,22 +51,13 @@ class TitleSerializerOne(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug'
     )
-    rating = serializers.SerializerMethodField()
-
-    def get_rating(self, obj):
-        rating = Review.objects.filter(
-            title=obj.id
-        ).aggregate(Avg('score'))['score__avg']
-        if rating is not None:
-            return round(rating)
-        return None
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description', 'category', 'genre', )
 
     def validate(self, data):
-        if data.get('year') and data.get('year') > timezone.now().year:
+        if data.get('year') and data.get('year') > dt.datetime.now().year:
             raise serializers.ValidationError(
                 'Год выпуска произведения, больше текущего!'
             )
@@ -137,7 +130,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'title', 'text', 'author', 'pub_date', 'score', )
 
     def validate(self, data):
         if self.context['request'].method == 'PATCH':
@@ -162,4 +155,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('id', 'review', 'text', 'author', 'pub_date', )

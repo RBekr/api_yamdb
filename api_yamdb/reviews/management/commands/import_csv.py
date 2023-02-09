@@ -1,3 +1,10 @@
+"""
+Импорт данных в базу данных sqlite из csv файл
+
+Пример использования:
+    python manage.py import_csv
+
+"""
 import os
 import sqlite3
 
