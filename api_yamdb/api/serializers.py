@@ -1,10 +1,11 @@
-import datetime as dt
-
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import Avg
 from rest_framework import serializers
+
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+
+from .validators import title_year_validator, username_not_me
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -56,12 +57,8 @@ class TitleSerializerOne(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'year', 'description', 'category', 'genre', )
 
-    def validate(self, data):
-        if data.get('year') and data.get('year') > dt.datetime.now().year:
-            raise serializers.ValidationError(
-                'Год выпуска произведения, больше текущего!'
-            )
-        return data
+    def validate_year(self, value):
+        return title_year_validator(value)
 
     def to_representation(self, instance):
         return TitleSerializerMany(instance).data
@@ -74,12 +71,8 @@ class UserSerializer(serializers.ModelSerializer):
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         )
 
-    def validate(self, value):
-        if value == 'me' or value == '':
-            raise serializers.ValidationError(
-                f'Имя пользователя не может быть равно {value}'
-            )
-        return value
+    def validate_username(self, value):
+        return username_not_me(value)
 
 
 class UserSignUpSerializer(serializers.Serializer):
@@ -95,20 +88,15 @@ class UserSignUpSerializer(serializers.Serializer):
         )
 
     def validate_username(self, value):
-        if value == 'me' or value == '':
-            raise serializers.ValidationError(
-                f'Имя пользователя не может быть равно {value}'
-            )
-        return value
+        return username_not_me(value)
 
     def validate(self, attrs):
+        MESSAGE = 'Пользователь с таким именем или email уже существует'
         user_by_username = User.objects.filter(username=attrs['username'])
         user_by_email = User.objects.filter(email=attrs['email'])
         if (user_by_username.exists
            and user_by_username.first() != user_by_email.first()):
-            raise serializers.ValidationError(
-                'Пользователь с таким именем или email уже существует'
-            )
+            raise serializers.ValidationError(MESSAGE)
         return super().validate(attrs)
 
 
@@ -133,13 +121,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'text', 'author', 'pub_date', 'score', )
 
     def validate(self, data):
+        MESSAGE = 'Вы уже поставили оценку данному произведению'
         if self.context['request'].method == 'PATCH':
             return data
         title = self.context['view'].kwargs['title_id']
         author = self.context['request'].user
         if Review.objects.filter(author=author, title__id=title).exists():
-            raise serializers.ValidationError('Вы уже поставили'
-                                              'оценку данному произведению')
+            raise serializers.ValidationError(MESSAGE)
         return data
 
 

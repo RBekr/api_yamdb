@@ -1,8 +1,6 @@
-import datetime as dt
-
-from django.core import validators
 from django.db import models
 
+from api.validators import title_year_validator, validate_score
 from users.models import User
 
 
@@ -47,12 +45,7 @@ class Title(models.Model):
     )
     year = models.PositiveIntegerField(
         verbose_name='Год публикации',
-        validators=[
-            validators.MaxValueValidator(
-                dt.datetime.today().year,
-                message='Год публикации не может быть больше текущего'
-            )
-        ]
+        validators=(title_year_validator, )
     )
     description = models.TextField(
         verbose_name='Описание',
@@ -107,16 +100,7 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         verbose_name='Оценка',
-        validators=[
-            validators.MinValueValidator(
-                1,
-                message='Оценка не может быть меньше 1'
-            ),
-            validators.MaxValueValidator(
-                10,
-                message='Оценка не может быть больше 10'
-            ),
-        ],
+        validators=(validate_score, )
     )
 
     class Meta:

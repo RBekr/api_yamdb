@@ -27,8 +27,8 @@ class Command(BaseCommand):
         for root, dirs, files in os.walk(path_to_csv):
             for file_name in files:
                 if file_name == 'user.csv':
-                    table_name = name_app + file_name.split(".")[0]
-                    df = pd.read_csv(f"{path_to_csv}/{file_name}")
+                    table_name = name_app + file_name.split('.')[0]
+                    df = pd.read_csv(f'{path_to_csv}/{file_name}')
                     query = 'SELECT count(*) FROM {} '.format(table_name)
                     c.execute(query)
                     data = c.fetchone()
